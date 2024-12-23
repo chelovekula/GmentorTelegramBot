@@ -108,10 +108,23 @@ func sendToTelegram(body string) {
 	for _, embed := range payload.Embeds {
 		description := strings.ReplaceAll(embed.Description, "http://mentor.gurps.ru", "")
 		description = formatDice(description)
+
+		// Извлечение ключевых частей описания
+		lines := strings.Split(description, "\n")
+		var result, outcome, action string
+		if len(lines) > 0 {
+			action = lines[0] // Первое действие
+		}
+		if len(lines) > 1 {
+			result = lines[1] // Результат броска
+		}
+		if len(lines) > 2 {
+			outcome = lines[2] // Итог
+		}
+
 		message := fmt.Sprintf(
-			"<b>Имя персонажа:</b> %s\n<b>Описание действия:</b> %s",
-			payload.Username,
-			description,
+			"🎲 <b>Бросок:</b> %s\n👤 <b>Персонаж:</b> %s\n📋 <b>Действие:</b> %s\n🎯 <b>Результат:</b> %s",
+			outcome, payload.Username, action, result,
 		)
 		if err := sendMessageToTelegram(message); err != nil {
 			log.Printf("Ошибка отправки в Telegram: %v", err)
